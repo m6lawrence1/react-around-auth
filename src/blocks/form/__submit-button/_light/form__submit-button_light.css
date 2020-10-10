@@ -1,0 +1,17 @@
+.form__submit-button_light{
+    background: #FFFFFF;
+    border-radius: 2px;
+    border-color: transparent;
+    color: #000000;
+    margin-bottom: 15px;
+    position: absolute;
+    bottom: 0;
+    right: auto;
+}
+
+.form__submit-button_light:hover{
+    transition: 1s;
+    background: #FFFFFF;
+    opacity: 0.65;
+    border-radius: 2px;
+}

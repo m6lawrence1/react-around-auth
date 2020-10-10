@@ -1,0 +1,10 @@
+.form_embedded {
+  position: relative;
+  min-height: 200px;
+}
+
+@media screen and (min-width: 768px) {
+  .form_embedded {
+    min-height: 300px;
+  }
+}
