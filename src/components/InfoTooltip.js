@@ -11,20 +11,12 @@ function InfoToolTip(props) {
       : "popup__status-icon_type_error"
   }`;
 
-  function handleOverlayClick(evt) {
-    if (evt.target.classList.contains("popup")) {
-      props.onClose();
-    }
-  }
-
-  //TODO - remove duplicate code to close overlay. Will need to create a separate Popup.js to handle all popup overlays. Did not have time to implement this right now will work on for future submission.
-
   return (
     <div
       className={`popup popup_type_register ${
         props.isOpen ? "popup_opened" : ""
       }`}
-      onClick={handleOverlayClick}
+      onClick={props.onOverlayClick}
     >
       <div className="popup__container popup__container_type_confirmation">
         <button

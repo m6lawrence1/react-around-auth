@@ -2,15 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 function PopupWithForm(props) {
-  function handleOverlayClick(evt) {
-    if (evt.target.classList.contains("popup")) {
-      props.onClose();
-    }
-  }
-
   const popup = (
     <div
-      onClick={handleOverlayClick}
+      onClick={props.onOverlayClick}
       className={`popup popup_type_${props.name} ${
         props.isOpen ? "popup_opened" : ""
       }`}

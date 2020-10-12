@@ -63,8 +63,6 @@ function App() {
     if (localStorage.getItem("jwt")) {
       tokenCheck();
     }
-
-    return Promise.all([userProfile, cardList]);
   }, []);
 
   React.useEffect(tokenCheck, []);
@@ -182,6 +180,12 @@ function App() {
     }
   }
 
+  function handleOverlayClick(evt) {
+    if (evt.target.classList.contains("popup")) {
+      closeAllPopups();
+    }
+  }
+
   function handleUpdateAvatar({ avatar }) {
     api
       .setUserAvatar({ avatar: avatar })
@@ -277,27 +281,36 @@ function App() {
           </Switch>
           <Footer />
           <EditAvatarPopup
+            onOverlayClick={handleOverlayClick}
             isOpen={isEditAvatarPopupOpen}
             onClose={closeAllPopups}
             onUpdateAvatar={handleUpdateAvatar}
           />
           <EditProfilePopup
+            onOverlayClick={handleOverlayClick}
             isOpen={isEditProfilePopupOpen}
             onClose={closeAllPopups}
             onUpdateUser={handleUpdateUser}
           />
           <AddPlacePopup
+            onOverlayClick={handleOverlayClick}
             isOpen={isAddPlacePopupOpen}
             onClose={closeAllPopups}
             onAddPlace={handleAddPlace}
           />
-          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+          <ImagePopup
+            onOverlayClick={handleOverlayClick}
+            card={selectedCard}
+            onClose={closeAllPopups}
+          />
           <InfoToolTip
+            onOverlayClick={handleOverlayClick}
             isOpen={isInfoToolTipOpen}
             onClose={closeAllPopups}
             success={authSuccess}
           />
           <ConfirmationPopup
+            onOverlayClick={handleOverlayClick}
             isOpen={isDeletePopupOpen}
             onClose={closeAllPopups}
             onConfirmation={handleCardDelete}
