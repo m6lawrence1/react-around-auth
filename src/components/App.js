@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Route, Switch, useHistory, withRouter } from "react-router-dom";
+import {
+  Route,
+  Switch,
+  useHistory,
+  Redirect,
+  withRouter,
+} from "react-router-dom";
 import "../index.css";
 import Login from "./Login";
 import Register from "./Register";
@@ -20,7 +26,7 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 function App() {
   // Login/Registration
   const [isInfoToolTipOpen, setIsInfoToolTipOpen] = useState(false);
-  const [authSuccess, setAuthSuccess] = useState(true);
+  const [authSuccess, setAuthSuccess] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const history = useHistory();
@@ -35,7 +41,7 @@ function App() {
   const [deletedCard, setDeletedCard] = useState(null);
 
   React.useEffect(() => {
-    api
+    const userProfile = api
       .getUserProfile()
       .then((userProfile) => {
         setCurrentUser(userProfile);
@@ -43,10 +49,8 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
 
-  React.useEffect(() => {
-    api
+    const cardList = api
       .getInitialCards()
       .then((initialCards) => {
         initialCards.forEach((card) => {
@@ -56,6 +60,11 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
+    if (localStorage.getItem("jwt")) {
+      tokenCheck();
+    }
+
+    return Promise.all([userProfile, cardList]);
   }, []);
 
   React.useEffect(tokenCheck, []);
@@ -210,7 +219,6 @@ function App() {
   }
 
   function handleCardDelete(deletedCard) {
-    console.log(deletedCard);
     api
       .deleteCard(deletedCard._id)
       .then(() => {
@@ -230,23 +238,7 @@ function App() {
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <Switch>
-            <Route path="/signin">
-              <Header
-                loggedIn={loggedIn}
-                email={userEmail}
-                link={{ description: "Sign up", to: "/signup" }}
-              />
-              <Login onSignin={handleSignin} />
-            </Route>
-            <Route path="/signup">
-              <Header
-                loggedIn={loggedIn}
-                email={userEmail}
-                link={{ description: "Log in", to: "/signin" }}
-              />
-              <Register onSignup={handleSignup} />
-            </Route>
-            <ProtectedRoute path="/" loggedIn={loggedIn}>
+            <ProtectedRoute path="/" exact loggedIn={loggedIn}>
               <Header
                 loggedIn={loggedIn}
                 email={userEmail}
@@ -263,6 +255,25 @@ function App() {
                 onCardDelete={handleDeleteClick}
               />
             </ProtectedRoute>
+            <Route path="/signin">
+              <Header
+                loggedIn={loggedIn}
+                email={userEmail}
+                link={{ description: "Sign up", to: "/signup" }}
+              />
+              <Login onSignin={handleSignin} />
+            </Route>
+            <Route path="/signup">
+              <Header
+                loggedIn={loggedIn}
+                email={userEmail}
+                link={{ description: "Log in", to: "/signin" }}
+              />
+              <Register onSignup={handleSignup} />
+            </Route>
+            <Route>
+              <Redirect to={loggedIn ? "/" : "/signin"} />
+            </Route>
           </Switch>
           <Footer />
           <EditAvatarPopup

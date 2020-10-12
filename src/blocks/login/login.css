@@ -2,5 +2,7 @@
 @import url("./__container/login__container.css");
 
 .login {
+  color: #fff;
+
   /*    height: 100%;*/
 }

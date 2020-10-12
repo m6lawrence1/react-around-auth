@@ -38,7 +38,7 @@ class Auth {
     return fetch(`${this._baseUrl}/users/me`, {
       headers: {
         ...this._headers,
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        Authorization: `Bearer ${token}`,
       },
     }).then(this._checkServerResponse);
   }

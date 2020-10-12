@@ -17,6 +17,8 @@ function InfoToolTip(props) {
     }
   }
 
+  //TODO - remove duplicate code to close overlay. Will need to create a separate Popup.js to handle all popup overlays. Did not have time to implement this right now will work on for future submission.
+
   return (
     <div
       className={`popup popup_type_register ${
