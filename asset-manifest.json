@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/react-around-auth/static/css/main.ea89d8ad.chunk.css",
-    "main.js": "/react-around-auth/static/js/main.30c44d90.chunk.js",
-    "main.js.map": "/react-around-auth/static/js/main.30c44d90.chunk.js.map",
+    "main.js": "/react-around-auth/static/js/main.ca1fbdf3.chunk.js",
+    "main.js.map": "/react-around-auth/static/js/main.ca1fbdf3.chunk.js.map",
     "runtime-main.js": "/react-around-auth/static/js/runtime-main.9b041db2.js",
     "runtime-main.js.map": "/react-around-auth/static/js/runtime-main.9b041db2.js.map",
     "static/js/2.13c4ed33.chunk.js": "/react-around-auth/static/js/2.13c4ed33.chunk.js",
     "static/js/2.13c4ed33.chunk.js.map": "/react-around-auth/static/js/2.13c4ed33.chunk.js.map",
     "index.html": "/react-around-auth/index.html",
-    "precache-manifest.a51c37dc8b8f7feb84cb2669b8236204.js": "/react-around-auth/precache-manifest.a51c37dc8b8f7feb84cb2669b8236204.js",
+    "precache-manifest.ba7659db3267aaf65da275f7ffd50068.js": "/react-around-auth/precache-manifest.ba7659db3267aaf65da275f7ffd50068.js",
     "service-worker.js": "/react-around-auth/service-worker.js",
     "static/css/main.ea89d8ad.chunk.css.map": "/react-around-auth/static/css/main.ea89d8ad.chunk.css.map",
     "static/js/2.13c4ed33.chunk.js.LICENSE.txt": "/react-around-auth/static/js/2.13c4ed33.chunk.js.LICENSE.txt",
@@ -19,6 +19,6 @@
     "static/js/runtime-main.9b041db2.js",
     "static/js/2.13c4ed33.chunk.js",
     "static/css/main.ea89d8ad.chunk.css",
-    "static/js/main.30c44d90.chunk.js"
+    "static/js/main.ca1fbdf3.chunk.js"
   ]
 }
