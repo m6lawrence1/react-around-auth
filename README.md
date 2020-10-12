@@ -10,7 +10,7 @@
 
 - Around the U.S. is an interactive page where users can add, remove, or like photos.
 - This repository contains the front-end project on React with added authorization and registration features.
-- URL: https://m6lawrence1.github.io/around-react-auth/index.html
+- URL: https://m6lawrence1.github.io/react-around-auth/
 
 All authorization, registration and token requests must go through to the server running on https://register.nomoreparties.co. Other requests which are not specified in this project may be connected to either this back end server, or the one you have been building.
 
