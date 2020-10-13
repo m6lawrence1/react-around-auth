@@ -63,6 +63,8 @@ function App() {
     if (localStorage.getItem("jwt")) {
       tokenCheck();
     }
+    //I can still use promise.all right? you just wanted me to remove "return"?
+    Promise.all([userProfile, cardList]);
   }, []);
 
   React.useEffect(tokenCheck, []);
