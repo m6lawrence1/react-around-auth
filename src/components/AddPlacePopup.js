@@ -23,6 +23,7 @@ function AddPlacePopup(props) {
       isOpen={props.isOpen}
       onClose={props.onClose}
       onSubmit={handleSubmit}
+      onOverlayClick={props.onOverlayClick}
     >
       <label className="form__field" htmlFor="title-input">
         <input
