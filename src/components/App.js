@@ -24,12 +24,12 @@ import auth from "../utils/auth";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"));
   // Login/Registration
   const [isInfoToolTipOpen, setIsInfoToolTipOpen] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
-  const history = useHistory();
   // User Profile/Cards
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -40,63 +40,21 @@ function App() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [deletedCard, setDeletedCard] = useState(null);
 
-  React.useEffect(() => {
-    const userProfile = api
-      .getUserProfile()
-      .then((userProfile) => {
-        setCurrentUser(userProfile);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const history = useHistory();
 
-    const cardList = api
-      .getInitialCards()
-      .then((initialCards) => {
-        initialCards.forEach((card) => {
-          setCards([...initialCards, card]);
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    if (localStorage.getItem("jwt")) {
-      tokenCheck();
-    }
-    //I can still use promise.all right? you just wanted me to remove "return"?
-    Promise.all([userProfile, cardList]);
-  }, []);
-
-  React.useEffect(tokenCheck, []);
-
-  function tokenCheck() {
-    const token = localStorage.getItem("token");
-    if (token) {
-      auth
-        .checkUserValidity(token)
-        .then((res) => {
-          if (res && res.data) {
-            setLoggedIn(true);
-            setUserEmail(res.data.email);
-            history.push("/");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }
-
-  function handleSignup({ email, password }) {
+  function handleSignup({ email, password, name, aboutme, avatar }) {
     auth
-      .registerUser(email, password)
+      .registerUser(email, password, name, aboutme, avatar)
       .then((res) => {
         if (res && res.data) {
           setIsInfoToolTipOpen(true);
           setAuthSuccess(true);
           setLoggedIn(true);
           setUserEmail(res.data.email);
-          history.push("/");
+          setToken(res.token);
+          localStorage.setItem("token", res.token);
+          history.push("/around");
+          setCurrentUser(res.data);
         }
       })
       .catch((err) => {
@@ -108,12 +66,14 @@ function App() {
   function handleSignin({ email, password }) {
     auth
       .loginUser(email, password)
-      .then((data) => {
-        if (data.token) {
+      .then((res) => {
+        if (res.token) {
+          setUserEmail(res.data.email);
+          setCurrentUser(res.data);
+          setToken(res.token);
+          localStorage.setItem("token", res.token);
           setLoggedIn(true);
-          localStorage.setItem("token", data.token);
-          history.push("/");
-          tokenCheck();
+          history.push("/around");
         }
       })
       .catch((err) => {
@@ -129,11 +89,12 @@ function App() {
   }
 
   function handleCardLike(card) {
+    const token = localStorage.getItem("token");
     // Check one more time if this card was already liked
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
     // Send a request to the API and getting the updated card data
     api
-      .updateLike(card._id, !isLiked)
+      .updateLike(token, card._id, !isLiked)
       .then((newCard) => {
         // Create a new array based on the existing one and putting a new card into it
         const newCards = cards.map((c) => (c._id === card._id ? newCard : c));
@@ -190,9 +151,9 @@ function App() {
 
   function handleUpdateAvatar({ avatar }) {
     api
-      .setUserAvatar({ avatar: avatar })
-      .then((userProfile) => {
-        setCurrentUser(userProfile);
+      .setUserAvatar(token, { avatar })
+      .then((res) => {
+        setCurrentUser(res.data);
         setIsEditAvatarPopupOpen(false);
       })
       .catch((err) => {
@@ -202,9 +163,9 @@ function App() {
 
   function handleUpdateUser({ name, about }) {
     api
-      .setUserProfile({ name: name, about: about })
-      .then((userProfile) => {
-        setCurrentUser(userProfile);
+      .setUserProfile(token, { name, about })
+      .then((res) => {
+        setCurrentUser(res.data);
         setIsEditProfilePopupOpen(false);
       })
       .catch((err) => {
@@ -214,7 +175,7 @@ function App() {
 
   function handleAddPlace({ title, link }) {
     api
-      .addCard({ name: title, link: link })
+      .addCard(token, { title, link })
       .then((newCard) => {
         setCards([...cards, newCard]);
         setIsAddPlacePopupOpen(false);
@@ -226,7 +187,7 @@ function App() {
 
   function handleCardDelete(deletedCard) {
     api
-      .deleteCard(deletedCard._id)
+      .deleteCard(token, deletedCard._id)
       .then(() => {
         const availableCards = cards.filter(
           (card) => card._id !== deletedCard._id
@@ -239,12 +200,55 @@ function App() {
       });
   }
 
+  React.useEffect(() => {
+    if (token) {
+      auth
+        .getContent(token)
+        .then((res) => {
+          setLoggedIn(true);
+          setUserEmail(res.data.email);
+          history.push("/around");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (token) {
+      const userProfile = api
+        .getUserProfile(token)
+        .then((res) => {
+          if (res && res.data) {
+            setCurrentUser(res.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      const cardList = api
+        .getInitialCards(token)
+        .then((initialCards) => {
+          initialCards.forEach((card) => {
+            setCards([...initialCards]);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      Promise.all([userProfile, cardList]);
+    }
+  }, [loggedIn]);
+
   return (
     <>
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <Switch>
-            <ProtectedRoute path="/" exact loggedIn={loggedIn}>
+            <ProtectedRoute path="/around" exact loggedIn={loggedIn}>
               <Header
                 loggedIn={loggedIn}
                 email={userEmail}
@@ -260,8 +264,38 @@ function App() {
                 onCardLike={handleCardLike}
                 onCardDelete={handleDeleteClick}
               />
+              <EditAvatarPopup
+                onOverlayClick={handleOverlayClick}
+                isOpen={isEditAvatarPopupOpen}
+                onClose={closeAllPopups}
+                onUpdateAvatar={handleUpdateAvatar}
+              />
+              <EditProfilePopup
+                onOverlayClick={handleOverlayClick}
+                isOpen={isEditProfilePopupOpen}
+                onClose={closeAllPopups}
+                onUpdateUser={handleUpdateUser}
+              />
+              <AddPlacePopup
+                onOverlayClick={handleOverlayClick}
+                isOpen={isAddPlacePopupOpen}
+                onClose={closeAllPopups}
+                onAddPlace={handleAddPlace}
+              />
+              <ImagePopup
+                onOverlayClick={handleOverlayClick}
+                card={selectedCard}
+                onClose={closeAllPopups}
+              />
+              <ConfirmationPopup
+                onOverlayClick={handleOverlayClick}
+                isOpen={isDeletePopupOpen}
+                onClose={closeAllPopups}
+                onConfirmation={handleCardDelete}
+                confirmSelectedCard={deletedCard}
+              />
             </ProtectedRoute>
-            <Route path="/signin">
+            <Route exact path="/signin">
               <Header
                 loggedIn={loggedIn}
                 email={userEmail}
@@ -269,7 +303,7 @@ function App() {
               />
               <Login onSignin={handleSignin} />
             </Route>
-            <Route path="/signup">
+            <Route exact path="/signup">
               <Header
                 loggedIn={loggedIn}
                 email={userEmail}
@@ -277,46 +311,16 @@ function App() {
               />
               <Register onSignup={handleSignup} />
             </Route>
-            <Route>
-              <Redirect to={loggedIn ? "/" : "/signin"} />
+            <Route exact path="/">
+              {loggedIn ? <Redirect to="/around" /> : <Redirect to="/signin" />}
             </Route>
           </Switch>
           <Footer />
-          <EditAvatarPopup
-            onOverlayClick={handleOverlayClick}
-            isOpen={isEditAvatarPopupOpen}
-            onClose={closeAllPopups}
-            onUpdateAvatar={handleUpdateAvatar}
-          />
-          <EditProfilePopup
-            onOverlayClick={handleOverlayClick}
-            isOpen={isEditProfilePopupOpen}
-            onClose={closeAllPopups}
-            onUpdateUser={handleUpdateUser}
-          />
-          <AddPlacePopup
-            onOverlayClick={handleOverlayClick}
-            isOpen={isAddPlacePopupOpen}
-            onClose={closeAllPopups}
-            onAddPlace={handleAddPlace}
-          />
-          <ImagePopup
-            onOverlayClick={handleOverlayClick}
-            card={selectedCard}
-            onClose={closeAllPopups}
-          />
           <InfoToolTip
             onOverlayClick={handleOverlayClick}
             isOpen={isInfoToolTipOpen}
             onClose={closeAllPopups}
             success={authSuccess}
-          />
-          <ConfirmationPopup
-            onOverlayClick={handleOverlayClick}
-            isOpen={isDeletePopupOpen}
-            onClose={closeAllPopups}
-            onConfirmation={handleCardDelete}
-            confirmSelectedCard={deletedCard}
           />
         </CurrentUserContext.Provider>
       </div>

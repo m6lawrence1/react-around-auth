@@ -1,8 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom";
+// import ReactDOM from "react-dom";
 
 function PopupWithForm(props) {
-  const popup = (
+  return (
     <div
       onClick={props.onOverlayClick}
       className={`popup popup_type_${props.name} ${
@@ -34,7 +34,6 @@ function PopupWithForm(props) {
       </div>
     </div>
   );
-  return ReactDOM.createPortal(popup, document.getElementById("root"));
 }
 
 export default PopupWithForm;
